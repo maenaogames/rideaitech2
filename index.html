@@ -36,7 +36,7 @@
 
         /* ページ切り替えアニメーション */
         .page-transition {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .hidden-page { display: none; opacity: 0; transform: translateY(10px); }
         .visible-page { display: block; opacity: 1; transform: translateY(0); }
@@ -92,6 +92,19 @@
             border-color: rgba(6, 182, 212, 0.4);
         }
 
+        /* モバイルメニュー */
+        #mobile-menu {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100%);
+            opacity: 0;
+            visibility: hidden;
+        }
+        #mobile-menu.active {
+            transform: translateX(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
         /* カスタムスクロールバー */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
@@ -115,7 +128,7 @@
         }
     </style>
 </head>
-<body class="selection:bg-cyan-900 selection:text-white">
+<body class="selection:bg-cyan-900 selection:text-white flex flex-col min-h-screen">
 
     <canvas id="bg-canvas"></canvas>
 
@@ -123,22 +136,40 @@
     <header class="sticky top-0 z-50 glass-nav">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center cursor-pointer group" onclick="showPage('home')">
-                <span class="text-2xl md:text-3xl font-black tracking-tighter italic text-white transition-colors group-hover:text-cyan-400">RideAI</span>
+                <span class="text-2xl md:text-3xl font-black tracking-tighter italic text-white transition-colors group-hover:text-cyan-400 uppercase">RideAI</span>
             </div>
 
-            <nav class="hidden lg:flex items-center space-x-8 text-[10px] font-black uppercase tracking-widest text-white">
+            <nav class="hidden lg:flex items-center space-x-8 text-[11px] font-black uppercase tracking-widest text-white">
                 <button onclick="showPage('home')" id="nav-home" class="nav-link hover:text-cyan-500 transition nav-link-active">ホーム</button>
                 <button onclick="showPage('services')" id="nav-services" class="nav-link hover:text-cyan-500 transition">事業内容</button>
                 <button onclick="showPage('pricing')" id="nav-pricing" class="nav-link hover:text-cyan-500 transition">料金プラン</button>
                 <button onclick="showPage('works')" id="nav-works" class="nav-link hover:text-cyan-500 transition">制作実績</button>
+                <button onclick="showPage('about')" id="nav-about" class="nav-link hover:text-cyan-500 transition">会社概要</button>
                 <button onclick="scrollToContact()" class="px-8 py-3 bg-white text-slate-950 rounded-full hover:bg-cyan-500 hover:text-white transition shadow-xl transform hover:scale-105 active:scale-95 text-xs font-black">お問い合わせ</button>
             </nav>
 
-            <button class="lg:hidden p-2 text-white" onclick="toggleMobileMenu()">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            <button class="lg:hidden p-2 text-white" onclick="toggleMobileMenu(true)">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
             </button>
         </div>
     </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-[60] bg-slate-950/95 flex flex-col p-8 lg:hidden">
+        <div class="flex justify-end mb-12">
+            <button onclick="toggleMobileMenu(false)" class="text-white p-2">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <nav class="flex flex-col space-y-6 text-3xl font-black uppercase italic tracking-tighter text-white">
+            <button onclick="showPage('home'); toggleMobileMenu(false)" class="text-left hover:text-cyan-400">ホーム</button>
+            <button onclick="showPage('services'); toggleMobileMenu(false)" class="text-left hover:text-cyan-400">事業内容</button>
+            <button onclick="showPage('pricing'); toggleMobileMenu(false)" class="text-left hover:text-cyan-400">料金プラン</button>
+            <button onclick="showPage('works'); toggleMobileMenu(false)" class="text-left hover:text-cyan-400">制作実績</button>
+            <button onclick="showPage('about'); toggleMobileMenu(false)" class="text-left hover:text-cyan-400">会社概要</button>
+            <button onclick="scrollToContact(); toggleMobileMenu(false)" class="text-left text-cyan-400 pt-6">お問い合わせ</button>
+        </nav>
+    </div>
 
     <main class="flex-grow min-h-screen">
 
@@ -164,8 +195,8 @@
                         </span>
                     </h1>
                     <div class="flex flex-col sm:flex-row justify-center gap-6 font-black uppercase italic text-xs">
-                        <button onclick="showPage('services')" class="px-10 py-5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-2xl transition shadow-[0_20px_50px_rgba(6,182,212,0.3)] transform hover:-translate-y-1">Service Details</button>
-                        <button onclick="showPage('pricing')" class="px-10 py-5 bg-white/10 hover:bg-white/20 text-white rounded-2xl transition border border-white/20 backdrop-blur-sm transform hover:-translate-y-1">Pricing Plan</button>
+                        <button onclick="showPage('services')" class="px-10 py-5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-2xl transition shadow-[0_20px_50px_rgba(6,182,212,0.3)] transform hover:-translate-y-1">サービス内容</button>
+                        <button onclick="showPage('pricing')" class="px-10 py-5 bg-white/10 hover:bg-white/20 text-white rounded-2xl transition border border-white/20 backdrop-blur-sm transform hover:-translate-y-1">料金プラン</button>
                     </div>
                 </div>
             </section>
@@ -191,7 +222,7 @@
                             <img src="https://images.unsplash.com/photo-1579389083046-e3df9c2b3325?auto=format&fit=crop&q=80&w=800" alt="" class="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:scale-110 transition-transform duration-700">
                             <div class="relative z-10">
                                 <h3 class="text-2xl font-black mb-8 tracking-tighter italic text-blue-400">YouTube・SNSメディア運営支援</h3>
-                                <p class="text-slate-400 leading-relaxed font-medium italic mb-10 text-sm">YouTubeやSNSを伸ばすための企画設計から、コンテンツ制作、運用までをサポート。AIを活用した分析に基づき、短期間で成長するメディア戦略を提供します。</p>
+                                <p class="text-slate-400 leading-relaxed font-medium italic mb-10 text-sm">YouTubeやSNSを伸ばすための企画設計から、コンテンツ制作、運用までをサポート. AIを活用した分析に基づき、短期間で成長するメディア戦略を提供します。</p>
                                 <button onclick="showPage('services')" class="text-blue-400 font-black text-[10px] uppercase tracking-widest border-b border-blue-400/30 pb-1 italic">サービスを見る →</button>
                             </div>
                         </div>
@@ -226,13 +257,13 @@
                                     <ul class="text-slate-300 text-sm space-y-1 list-disc pl-5 font-medium">
                                         <li>チャンネル開設2ヶ月で登録者 4万人突破</li>
                                         <li>総再生回数 300万回以上</li>
-                                        <li>AIによる制作ワークフロー構築で効率改善111</li>
+                                        <li>AIによる制作ワークフロー構築で効率改善</li>
                                     </ul>
                                 </div>
                                 <button onclick="showPage('works')" class="px-10 py-5 bg-white/5 border border-white/20 rounded-2xl font-black italic text-xs uppercase tracking-widest hover:bg-white/10 transition">詳細を確認</button>
                             </div>
                             <div class="lg:w-1/2 relative bg-slate-900 min-h-[400px]">
-                                <img src="imges/anime-economy2.png" style="width: 100%; height: auto; alt="[アニメで世界経済]" class="w-full h-full object-cover opacity-90 transition-transform duration-1000 hover:scale-105" onerror="this.src='https://placehold.co/1280x720/020617/fbbf24?text=Anime+Economy'">
+                                <img src="imges/anime-economy2.png" style="width: 100%; height: auto;" alt="[アニメで世界経済]" class="w-full h-full object-cover opacity-90 transition-transform duration-1000 hover:scale-105" onerror="this.src='https://placehold.co/1280x720/020617/fbbf24?text=Anime+Economy'">
                             </div>
                         </div>
                         <!-- Kii Channel Card -->
@@ -244,7 +275,7 @@
                                 <button onclick="showPage('works')" class="px-10 py-5 bg-white/5 border border-white/20 rounded-2xl font-black italic text-xs uppercase tracking-widest hover:bg-white/10 transition">詳細を確認</button>
                             </div>
                             <div class="lg:w-1/2 relative bg-slate-900 min-h-[400px]">
-                                <img src="imges/kiicar2.png" style="width: 100%; height: auto; alt="[きぃちゃんネル]" class="w-full h-full object-cover opacity-90 transition-transform duration-1000 hover:scale-105" onerror="this.src='https://placehold.co/1280x720/020617/2563eb?text=Kii+Channel'">
+                                <img src="imges/kiicar2.png" style="width: 100%; height: auto;" alt="[きぃちゃんネル]" class="w-full h-full object-cover opacity-90 transition-transform duration-1000 hover:scale-105" onerror="this.src='https://placehold.co/1280x720/020617/2563eb?text=Kii+Channel'">
                             </div>
                         </div>
                     </div>
@@ -256,12 +287,12 @@
                 <div class="max-w-4xl mx-auto text-white italic">
                     <div class="glass-card bg-slate-950/80 rounded-[80px] p-16 md:p-32 relative overflow-hidden shadow-3xl border border-white/5">
                         <div class="relative z-10">
-                            <h2 class="text-5xl md:text-8xl font-black mb-14 tracking-tighter italic uppercase text-glow">Contact.</h2>
+                            <h2 class="text-5xl md:text-8xl font-black mb-14 tracking-tighter italic uppercase text-glow">お問い合わせ.</h2>
                             <p class="text-slate-300 text-xl font-medium mb-12 italic leading-relaxed">
                                 当社サービスに関するお問い合わせは、<br class="hidden md:block">下記メールアドレスよりご連絡ください。
                             </p>
-                            <div class="inline-block p-10 glass-card rounded-[40px] border border-cyan-500/50 hover-neon transition-all group">
-                                <p class="text-cyan-400 font-black font-mono text-2xl md:text-4xl tracking-tighter italic text-glow lowercase">create.with.ai2025@gmail.com</p>
+                            <div class="inline-block w-full max-w-lg p-6 md:p-10 glass-card rounded-[40px] border border-cyan-500/50 hover-neon transition-all group overflow-hidden">
+                                <p class="text-cyan-400 font-black font-mono text-xl md:text-4xl tracking-tighter italic text-glow lowercase break-all">create.with.ai2025@gmail.com</p>
                             </div>
                         </div>
                     </div>
@@ -393,13 +424,13 @@
                     <div class="glass-card p-12 md:p-20 rounded-[80px] border border-white/10">
                         <div class="grid lg:grid-cols-2 gap-20 items-center">
                             <div class="space-y-10">
-                                <span class="bg-red-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase italic tracking-widest inline-block">Flagship Media</span>
+                                <span class="bg-red-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase italic tracking-widest inline-block">自社フラッグシップメディア</span>
                                 <h3 class="text-5xl md:text-7xl font-black italic mb-10 leading-none text-white italic">アニメで<br>世界経済</h3>
                                 <div class="space-y-8 text-slate-400 leading-relaxed italic text-lg border-l-8 border-cyan-500 pl-8 mb-12 font-medium italic">
                                     <p>「アニメで世界経済」は、国際情勢や経済ニュースを分かりやすく解説する自社メディアのYouTubeチャンネルです。国際政治、経済、地政学などの複雑なテーマを、アニメーションとビジュアルを用いて誰でも理解できる形で発信しています。</p>
                                     <p>Googleの画像生成AIなどの最新AI技術を活用し、台本に応じて映像素材を生成する独自の動画制作ワークフローを構築。AIによる効率的な制作体制により、スピーディーなコンテンツ発信を実現しています。</p>
                                     <div class="mt-10">
-                                        <h4 class="mb-4">実績</h4>
+                                        <h4 class="mb-4 italic">実績</h4>
                                         <ul class="list-disc pl-5 space-y-2 text-slate-300">
                                             <li>2ヶ月で登録者 4万人突破</li>
                                             <li>総再生回数 300万回以上</li>
@@ -409,16 +440,16 @@
                                 <a href="https://www.youtube.com/@%E3%82%A2%E3%83%8B%E3%83%A1%E3%81%A7%E4%B8%96%E7%95%8C%E7%B5%8C%E6%B8%88" target="_blank" class="inline-flex items-center px-10 py-5 bg-red-600 text-white font-black rounded-2xl shadow-xl hover:bg-red-500 transition italic tracking-tighter uppercase">YouTubeを表示</a>
                             </div>
                             <div class="rounded-[50px] overflow-hidden shadow-3xl border-4 border-slate-900">
-                                <img src="imges/anime-economy.png" style="width: 100%; height: auto; alt="[アニメで世界経済]" class="w-full h-auto transform transition-transform duration-1000 hover:scale-105">
+                                <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&q=80&w=1280" alt="[実績アニメ画像]" class="w-full h-full object-cover transform transition-transform duration-1000 hover:scale-105">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Project Detail: Kii Channel (RESTORED) -->
+                    <!-- Project Detail: Kii Channel -->
                     <div class="glass-card p-12 md:p-20 rounded-[80px] border border-white/10">
                         <div class="grid lg:grid-cols-2 gap-20 items-center">
                             <div class="space-y-10">
-                                <span class="bg-blue-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase italic tracking-widest inline-block">Successful Case</span>
+                                <span class="bg-blue-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase italic tracking-widest inline-block">成功実績</span>
                                 <h3 class="text-5xl md:text-7xl font-black italic mb-10 leading-none text-white italic">きぃちゃんネル</h3>
                                 <div class="space-y-8 text-slate-400 leading-relaxed italic text-lg border-l-8 border-blue-500 pl-8 mb-12 font-medium italic">
                                     <p>「きぃちゃんネル」は、車や地域企業とのコラボ企画を中心に、エンターテインメント性の高いコンテンツを発信するYouTubeチャンネルです。実際の体験や企画を通じて、車の魅力や企業の取り組みを分かりやすく紹介し、視聴者が楽しみながら学べる動画コンテンツを制作しています。</p>
@@ -437,7 +468,7 @@
                                 <a href="https://www.youtube.com/@kiicar" target="_blank" class="inline-flex items-center px-10 py-5 bg-blue-600 text-white font-black rounded-2xl shadow-xl hover:bg-blue-500 transition italic tracking-tighter uppercase">YouTubeを表示</a>
                             </div>
                             <div class="rounded-[50px] overflow-hidden shadow-3xl border-4 border-slate-900">
-                                <img src="imges/kiicar2.png" style="width: 100%; height: auto; alt="[車ライフスタイル]" class="w-full h-auto transform transition-transform duration-1000 hover:scale-105">
+                                <img src="imges/kiicar2.png" style="width: 100%; height: auto;" alt="[車ライフスタイル]" class="w-full h-auto transform transition-transform duration-1000 hover:scale-105">
                             </div>
                         </div>
                     </div>
@@ -446,111 +477,106 @@
         </div>
 
         <!-- =========================================
-             プライバシーポリシー (Privacy)
+             会社概要ページ (About)
         ========================================= -->
-        <div id="page-privacy" class="page-transition hidden-page text-white italic">
-            <section class="py-32 px-6">
+        <div id="page-about" class="page-transition hidden-page px-6 text-white italic">
+            <section class="py-32">
+                <div class="max-w-4xl mx-auto mb-24 text-center">
+                    <h2 class="text-5xl md:text-8xl font-black tracking-tighter section-title italic uppercase">会社概要</h2>
+                </div>
+                <div class="max-w-4xl mx-auto">
+                    <div class="glass-card rounded-[50px] p-8 md:p-16 border border-white/10 shadow-2xl">
+                        <table class="w-full text-left font-medium">
+                            <tbody class="divide-y divide-white/5">
+                                <tr>
+                                    <th class="py-8 w-1/3 text-slate-500 uppercase font-black text-[10px] tracking-[0.2em] italic">会社名</th>
+                                    <td class="py-8 text-xl font-bold italic text-white">合同会社RideAI</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-8 w-1/3 text-slate-500 uppercase font-black text-[10px] tracking-[0.2em] italic">代表者</th>
+                                    <td class="py-8 text-xl font-bold italic text-white">前田 尚也</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-8 w-1/3 text-slate-500 uppercase font-black text-[10px] tracking-[0.2em] italic">所在地</th>
+                                    <td class="py-8 text-slate-400 italic text-white">香川県三豊市高瀬町上麻2788番地1</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-8 w-1/3 text-slate-500 uppercase font-black text-[10px] tracking-[0.2em] italic">設立</th>
+                                    <td class="py-8 text-slate-400 italic text-white">2025年</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-8 w-1/3 text-slate-500 uppercase font-black text-[10px] tracking-[0.2em] italic">資本金</th>
+                                    <td class="py-8 text-xl font-bold italic text-white">500,000円</td>
+                                </tr>
+                                <tr>
+                                    <th class="py-8 w-1/3 text-slate-500 uppercase font-black text-[10px] tracking-[0.2em] italic">事業内容</th>
+                                    <td class="py-8">
+                                        <ul class="space-y-3 text-slate-400 italic list-none p-0 m-0 text-sm md:text-base text-white">
+                                            <li class="flex items-start gap-3">
+                                                <span class="text-white font-bold">・</span>
+                                                <span>AI導入コンサルティング及び業務自動化支援</span>
+                                            </li>
+                                            <li class="flex items-start gap-3">
+                                                <span class="text-white font-bold">・</span>
+                                                <span>YouTube・SNS等のメディア運営代行・プロデュース</span>
+                                            </li>
+                                            <li class="flex items-start gap-3">
+                                                <span class="text-white font-bold">・</span>
+                                                <span>最新生成AIを活用した動画・クリエイティブ制作</span>
+                                            </li>
+                                            <li class="flex items-start gap-3">
+                                                <span class="text-white font-bold">・</span>
+                                                <span>AI技術を用いたデータ分析及びマーケティング戦略立案</span>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="py-8 w-1/3 text-slate-500 uppercase font-black text-[10px] tracking-[0.2em] italic">連絡先</th>
+                                    <td class="py-8">
+                                        <a href="mailto:create.with.ai2025@gmail.com" class="text-white italic hover:underline break-all transition-all">create.with.ai2025@gmail.com</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- =========================================
+             リーガル
+        ========================================= -->
+        <div id="page-privacy" class="page-transition hidden-page px-6 text-white italic">
+            <section class="py-32">
                 <div class="max-w-4xl mx-auto mb-16 text-center">
                     <h2 class="text-4xl font-black tracking-tighter section-title italic uppercase">プライバシーポリシー</h2>
                 </div>
                 <div class="glass-card p-12 md:p-24 rounded-[60px] max-w-4xl mx-auto legal-content italic font-medium text-left">
                     <p>合同会社RideAI（以下「当社」といいます）は、個人情報の重要性を認識し、個人情報保護に関する法令およびその他の規範を遵守し、以下の方針に基づき適切な管理と保護に努めます。</p>
-
-                    <h3>1. 個人情報の取得</h3>
-                    <p>当社は、お問い合わせフォーム、メール、サービスの利用などを通じて、氏名、メールアドレス、会社名などの個人情報を適法かつ公正な手段により取得します。</p>
-
-                    <h3>2. 個人情報の利用目的</h3>
-                    <p>取得した個人情報は、以下の目的の範囲内で利用します。</p>
-                    <ul class="list-disc pl-5">
-                        <li>お問い合わせへの回答および対応</li>
-                        <li>当社サービスの提供および運営</li>
-                        <li>サービス改善および新サービス開発</li>
-                        <li>必要なご連絡や重要なお知らせの通知</li>
-                        <li>法令に基づく対応</li>
-                    </ul>
-
-                    <h3>3. 個人情報の第三者提供</h3>
-                    <p>当社は、以下の場合を除き、本人の同意なく個人情報を第三者へ提供することはありません。</p>
-                    <ul class="list-disc pl-5">
-                        <li>法令に基づく場合</li>
-                        <li>人の生命、身体または財産の保護のために必要な場合</li>
-                        <li>国または地方公共団体の法令業務に協力する場合</li>
-                    </ul>
-
-                    <h3>4. 個人情報の管理</h3>
-                    <p>当社は、個人情報の漏えい、紛失、改ざんなどを防止するため、適切な安全管理措置を講じます。</p>
-
-                    <h3>5. 個人情報の開示・訂正・削除</h3>
-                    <p>本人から個人情報の開示、訂正、削除等の請求があった場合、本人確認の上、速やかに対応します。</p>
-
-                    <h3>6. プライバシーポリシーの変更</h3>
-                    <p>本ポリシーの内容は、法令変更やサービス内容の変更に応じて改定する場合があります。</p>
-
-                    <h3>7. お問い合わせ</h3>
-                    <p>本ポリシーに関するお問い合わせは、当社メールよりご連絡ください。</p>
                     <p class="text-white font-bold mt-4 italic">合同会社RideAI</p>
                 </div>
             </section>
         </div>
 
-        <!-- =========================================
-             利用規約 (Terms)
-        ========================================= -->
-        <div id="page-terms" class="page-transition hidden-page text-white italic">
-            <section class="py-32 px-6 text-center">
-                <h2 class="text-4xl font-black tracking-tighter section-title italic uppercase italic">利用規約</h2>
+        <div id="page-terms" class="page-transition hidden-page px-6 text-white italic">
+            <section class="py-32">
+                <h2 class="text-4xl font-black tracking-tighter section-title italic uppercase text-center w-full block">利用規約</h2>
                 <div class="glass-card p-12 md:p-24 rounded-[60px] max-w-4xl mx-auto legal-content text-left italic font-medium mt-16 text-white">
-                    <p>本利用規約は、合同会社RideAI（以下「当社」といいます）が提供するサービスおよびウェブサイト（以下「本サービス」といいます）の利用条件を定めるものです。本サービスを利用することで、本規約に同意したものとみなします。</p>
-
-                    <h3>第1条（適用）</h3>
-                    <p>本規約は、本サービスの利用に関する当社と利用者との間の一切の関係に適用されます。</p>
-
-                    <h3>第2条（禁止事項）</h3>
-                    <p>利用者は、本サービスの利用にあたり、以下の行為を行ってはなりません。</p>
-                    <ul class="list-disc pl-5">
-                        <li>法令または公序良俗に違反する行為</li>
-                        <li>犯罪行為に関連する行為</li>
-                        <li>当社または第三者の知的財産権を侵害する行為</li>
-                        <li>サービス運営を妨害する行為</li>
-                        <li>虚偽の情報を提供する行為</li>
-                        <li>その他当社が不適切と判断する行為</li>
-                    </ul>
-
-                    <h3>第3条（サービス内容の変更）</h3>
-                    <p>当社は、利用者に通知することなく、本サービスの内容を変更または停止することがあります。</p>
-
-                    <h3>第4条（免責事項）</h3>
-                    <p>当社は、本サービスの利用により生じた損害について、当社の故意または重大な過失がある場合を除き、一切の責任を負いません。</p>
-
-                    <h3>第5条（著作権）</h3>
-                    <p>本サービス内の文章、画像、動画、プログラムなどの著作権は当社または正当な権利者に帰属します。</p>
-
-                    <h3>第6条（規約の変更）</h3>
-                    <p>当社は、必要に応じて本規約を変更することがあります。</p>
+                    <p>本利用規約は、合同会社RideAI（以下「当社」といいます）が提供するサービスおよびウェブサイト（以下「本サービス」といいます）の利用条件を定めるものです。</p>
                 </div>
             </section>
         </div>
 
-        <!-- =========================================
-             特定商取引法に基づく表記 (Commerce)
-        ========================================= -->
-        <div id="page-commerce" class="page-transition hidden-page text-white italic">
-            <section class="py-32 px-6 text-center">
-                <h2 class="text-4xl font-black tracking-tighter section-title italic uppercase italic">特定商取引法に基づく表記</h2>
-                <div class="glass-card p-12 md:p-20 rounded-[60px] max-w-4xl mx-auto text-left italic font-medium mt-16">
-                    <table class="w-full text-left text-sm border-collapse text-white">
+        <div id="page-commerce" class="page-transition hidden-page px-6 text-white italic">
+            <section class="py-32">
+                <h2 class="text-4xl font-black tracking-tighter section-title italic uppercase text-center w-full block">特定商取引法に基づく表記</h2>
+                <div class="glass-card p-12 md:p-20 rounded-[60px] max-w-4xl mx-auto text-left italic font-medium mt-16 text-white">
+                    <table class="w-full text-left text-sm border-collapse">
                         <tbody class="divide-y divide-white/10">
                             <tr><th class="py-6 w-1/3 text-slate-500 uppercase font-black tracking-widest italic">販売事業者</th><td class="py-6 text-white font-bold italic">合同会社RideAI</td></tr>
-                            <tr><th class="py-6 text-slate-500 uppercase font-black tracking-widest italic">代表責任者</th><td class="py-6 text-white font-bold italic">前田 尚也</td></tr>
-                            <tr><th class="py-6 text-slate-500 uppercase font-black tracking-widest italic">所在地</th><td class="py-6 text-slate-400 italic">香川県三豊市高瀬町上麻2788番地1</td></tr>
-                            <tr><th class="py-6 text-slate-500 uppercase font-black tracking-widest italic">電話番号</th><td class="py-6 text-slate-400 italic">070-7534-4259</td></tr>
-                            <tr><th class="py-6 text-slate-500 uppercase font-black tracking-widest italic">メールアドレス</th><td class="py-6 text-cyan-400 italic lowercase">create.with.ai2025@gmail.com</td></tr>
-                            <tr><th class="py-6 text-slate-500 uppercase font-black tracking-widest italic">販売価格</th><td class="py-6 text-slate-400 italic">各サービスページに記載</td></tr>
-                            <tr><th class="py-6 text-slate-500 uppercase font-black tracking-widest italic">商品代金以外の<br>必要料金</th><td class="py-6 text-slate-400 italic">インターネット接続料金、通信料金等はお客様の負担となります。</td></tr>
-                            <tr><th class="py-6 text-slate-500 uppercase font-black tracking-widest italic">支払方法</th><td class="py-6 text-slate-400 italic">銀行振込、クレジットカード、その他当社が指定する方法</td></tr>
-                            <tr><th class="py-6 text-slate-500 uppercase font-black tracking-widest italic">支払時期</th><td class="py-6 text-slate-400 italic">各サービス申し込み時または契約時にお支払いいただきます。</td></tr>
-                            <tr><th class="py-6 text-slate-500 uppercase font-black tracking-widest italic">商品の引渡時期</th><td class="py-6 text-slate-400 italic">サービス内容に応じて個別にご案内します。</td></tr>
-                            <tr><th class="py-6 text-slate-500 uppercase font-black tracking-widest italic">キャンセル・返品</th><td class="py-6 text-slate-400 italic">サービスの性質上、原則として購入後のキャンセルおよび返金はお受けしておりません。ただし当社が特別に認めた場合はこの限りではありません。</td></tr>
+                            <tr><th class="py-6 w-1/3 text-slate-500 uppercase font-black tracking-widest italic">代表責任者</th><td class="py-6 text-white font-bold italic">前田 尚也</td></tr>
+                            <tr><th class="py-6 w-1/3 text-slate-500 uppercase font-black tracking-widest italic">メールアドレス</th><td class="py-6 text-white italic lowercase">create.with.ai2025@gmail.com</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -564,7 +590,7 @@
         <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-12">
             <div>
                 <div class="flex items-center cursor-pointer mb-6" onclick="showPage('home')">
-                    <span class="text-2xl font-black italic text-white transition-colors hover:text-cyan-400">RideAI</span>
+                    <span class="text-2xl font-black italic text-white transition-colors hover:text-cyan-400 uppercase">RideAI</span>
                 </div>
                 <div class="flex flex-wrap gap-x-6 gap-y-2 italic text-[10px] text-slate-600 font-bold uppercase tracking-widest">
                     <button onclick="showPage('privacy')" class="hover:text-cyan-400 transition">プライバシーポリシー</button>
@@ -573,13 +599,14 @@
                 </div>
             </div>
             <div class="flex flex-col lg:items-end justify-between text-right font-black">
-                <nav class="flex gap-x-8 text-[10px] text-white font-black uppercase tracking-[0.3em] italic">
+                <nav class="flex flex-wrap justify-center lg:justify-end gap-x-8 gap-y-4 text-[11px] text-white font-black uppercase tracking-[0.3em] italic">
                     <button onclick="showPage('home')" class="hover:text-cyan-500 transition">ホーム</button>
                     <button onclick="showPage('services')" class="hover:text-cyan-500 transition">事業内容</button>
                     <button onclick="showPage('pricing')" class="hover:text-cyan-500 transition">料金プラン</button>
                     <button onclick="showPage('works')" class="hover:text-cyan-500 transition">制作実績</button>
+                    <button onclick="showPage('about')" class="hover:text-cyan-500 transition">会社概要</button>
                 </nav>
-                <p class="text-slate-700 text-[9px] font-medium tracking-widest uppercase mt-8 italic">&copy; 2026 Godo Kaisha RideAI. INNOVATION HUB.</p>
+                <p class="text-slate-700 text-[9px] font-medium tracking-widest uppercase mt-8 italic">&copy; 2026 RideAI LLC. ALL RIGHTS RESERVED.</p>
             </div>
         </div>
     </footer>
@@ -587,7 +614,7 @@
     <!-- JavaScript Logic -->
     <script>
         function showPage(pageId) {
-            const pages = ['home', 'services', 'pricing', 'works', 'privacy', 'terms', 'commerce'];
+            const pages = ['home', 'services', 'pricing', 'works', 'about', 'privacy', 'terms', 'commerce'];
 
             pages.forEach(p => {
                 const el = document.getElementById('page-' + p);
@@ -610,7 +637,8 @@
                 'home': 'nav-home',
                 'services': 'nav-services',
                 'pricing': 'nav-pricing',
-                'works': 'nav-works'
+                'works': 'nav-works',
+                'about': 'nav-about'
             };
             const activeNavId = navIdMap[pageId];
             if (activeNavId) {
@@ -631,12 +659,19 @@
                 setTimeout(() => {
                     const target = document.getElementById('contact-home');
                     if (target) target.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
+                }, 400);
             }
         }
 
-        function toggleMobileMenu() {
-            showPage('home');
+        function toggleMobileMenu(isOpen) {
+            const menu = document.getElementById('mobile-menu');
+            if (isOpen) {
+                menu.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                menu.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
         }
 
         // Background Particles
@@ -688,6 +723,7 @@
             canvas.height = window.innerHeight;
             particles = [];
             let count = (canvas.width * canvas.height) / 20000;
+            if (count > 150) count = 150;
             for (let i = 0; i < count; i++) particles.push(new Particle());
         }
 
